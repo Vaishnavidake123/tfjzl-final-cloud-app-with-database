@@ -1,3 +1,29 @@
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from .models import Course, Lesson, Question, Choice, Submission, Enrollment
+
+# Create your views here.
+
+def submit(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    
+    # Get the user's enrollment for this course
+    enrollment = get_object_or_404(Enrollment, user=request.user, course=course)
+    
+    if request.method == 'POST':
+        # Create a new submission object
+        submission = Submission.objects.create(enrollment=enrollment)
+        
+        # Loop through all questions and extract selected choices from the POST request
+        for question in course.question_set.all():
+            for choice in question.choice_set.all():
+                # Check if the choice checkbox was selected in the form
+                if request.POST.get(f'choice_{choice.id}'):
+                    submission.choices.add(choice)
+                    
+        return redirect(reverse('onlinecourse:show_exam_result', args=[course.id, submission.id]))
+
 def show_exam_result(request, course_id, submission_id):
     context = {}
     course = get_object_or_404(Course, pk=course_id)
