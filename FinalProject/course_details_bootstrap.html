@@ -41,7 +41,7 @@
     <!-- Page content -->
     <div class="container-fluid">
         <h2>{{ course.name }}</h2>
-        <div class="card-columns-vertical">
+        <div class="card-deck">
             {% for lesson in course.lesson_set.all %}
                 <div class="card mt-1">
                     <div class="card-header"><h5>Lesson {{lesson.order|add:1}}: {{lesson.title}}</h5></div>
